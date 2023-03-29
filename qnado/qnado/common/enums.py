@@ -1,0 +1,38 @@
+# handler 相关常量
+AJAX_SUCCESS = 0
+AJAX_FAIL_NORMAL = -1
+
+ERRCODE_DICT = {
+    AJAX_SUCCESS: '成功',
+    AJAX_FAIL_NORMAL: '出错啦',
+}
+
+
+# 任务状态
+TASK_SUBMITTED = 0
+TASK_RUNNING = 1
+TASK_SUCCESS = 2
+TASK_FAILED = -1
+
+TASK_STATUS = {
+    TASK_RUNNING: '已提交',
+    TASK_RUNNING: '执行中',
+    TASK_SUCCESS: '执行成功',
+    TASK_FAILED: '执行失败',
+}
+
+# 可配置 handler 列表
+SERVER_TASK_HANDLER = 'task_handler'
+SERVER_WEB_TASK_HANDLER = 'web_task_handler'
+SERVER_HANDLERS = {
+    SERVER_TASK_HANDLER: 'TASK API',
+    SERVER_WEB_TASK_HANDLER: 'TASK WEB TOOL'
+}
+
+# celery 队列命名模式
+CELERY_NAME_MODE_HOSTNAME = 'hostname'          # 以主机名区分队列
+CELERY_NAME_MODE_USERFILE_MD5 = 'userfile_md5'  # 以用户文件区分队列（支持多节点消费同一队列）
+CELERY_NAME_MODES = {
+    CELERY_NAME_MODE_HOSTNAME: CELERY_NAME_MODE_HOSTNAME,
+    CELERY_NAME_MODE_USERFILE_MD5: CELERY_NAME_MODE_USERFILE_MD5
+}

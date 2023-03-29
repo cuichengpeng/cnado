@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">    <title>{{ title }}</title>
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/css/bootstrap.min.css" rel="stylesheet">
+    <script>
+        function parse1(str) {
+            return JSON.stringify(JSON.parse(str), null, "\t");
+        }
+
+        function parse2(str) {
+            str = JSON.stringify(JSON.parse(str), null, 2);
+            str = str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+            return str.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                var cls = 'number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'key';
+                    } else {
+                        cls = 'string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+
+        window.onload = function(){
+            $('#submit_btn').bind('click', function(){
+                var fields = $('#ff-submit').serializeArray();
+                var obj = {};
+                $.each(fields, function(index, field){
+                    obj[field.name] = field.value;
+                })
+                $.ajax({
+                    type: 'post',
+                    url: '{{ web_utils_url }}',
+                    async: true,
+                    contentType: 'application/json',
+                    data: JSON.stringify(obj),
+                    success: function(data, textStatus, jqXHR){
+                        $('#res_content').text(JSON.stringify(data, null, "\t"));
+                    },
+                    error: function(jqXHR, textStatus, errorThrown){
+                        alert(textStatus);
+                    }
+                })
+            });
+            $('#query_btn').bind('click', function(){
+                var fields = $('#ff-query').serializeArray();
+                var obj = {};
+                $.each(fields, function(index, field){
+                    obj[field.name] = field.value;
+                })
+                $.ajax({
+                    type: 'get',
+                    url: '{{ task_query_url }}',
+                    async: true,
+                    data: obj,
+                    success: function(data, textStatus, jqXHR){
+                        $('#task_detail').text(JSON.stringify(data, null, "\t"));
+                    },
+                    error: function(jqXHR, textStatus, errorThrown){
+                        alert(textStatus);
+                    }
+                })
+            })
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="col-md-8 offset-md-2">
+            <h1>任务提交</h1>
+            <hr>
+            <p>提示 1：字符串需要使用双引号包裹</p>
+            <p>提示 2：布尔型首字母小写，例如 true, false</p>
+            <form class="row" id="ff-submit">
+                {% for arg in input_args %}
+                <div class="col-md-2">
+                    <input type="text" readonly class="form-control-plaintext" value="{{ arg.name }}">
+                </div>
+                <div class="col-md-2">
+                    <input type="text" readonly class="form-control-plaintext" value="{{ arg.dtype }}">
+                </div>
+                <div class="col-md-8">
+                    <input class="form-control" name="{{ arg.name }}">
+                </div>
+                {% end %}
+            </form>
+            <div class="text-end" style="padding-top: 10px;padding-bottom: 10px;">
+                <button id="submit_btn" type="button" class="btn btn-primary">Submit</button>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    Response
+                </div>
+                <div class="card-body">
+                    <pre id="res_content"></pre>
+                </div>
+            </div>
+
+            <!-- 查询任务 -->
+            <h1 style="padding-top: 100px;">任务查询</h1>
+            <hr>
+            <form class="row" id="ff-query">
+                <div class="col-md-4">
+                    <input type="text" readonly class="form-control-plaintext" value="task_id">
+                </div>
+                <div class="col-md-8">
+                    <input class="form-control" name="task_id">
+                </div>
+                <div class="text-end" style="padding-top: 10px;padding-bottom: 10px;">
+                    <button id="query_btn" type="button" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+            <div class="card" style="margin-bottom: 100px;">
+                <div class="card-header">
+                    Task Detail
+                </div>
+                <div class="card-body">
+                    <pre id="task_detail"></pre>
+                </div>
+            </div>
+
+
+
+            <!-- 历史任务暂不支持 -->
+            <!-- <h1 style="padding-top: 100px;">History</h1>
+            <div class="card">
+                <div class="card-header">
+                  task_id: 1234
+                </div>
+                <div class="card-body">
+                  <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.3/js/bootstrap.min.js"></script>
+</body>
+</html>
